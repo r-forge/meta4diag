@@ -7,6 +7,8 @@
 
 ########## summary marginal
 .summary.marginal = function(m, level = level){
+  keep_ind = which(!is.infinite(m[,2]))
+  m = m[keep_ind,]
   m1 = INLA::inla.emarginal(function(x) x^1, m)
   m2 = INLA::inla.emarginal(function(x) x^2, m)
   stdev = sqrt(m2 - m1^2)

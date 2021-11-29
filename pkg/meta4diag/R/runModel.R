@@ -124,7 +124,7 @@ library(INLA) \n")
                          control.inla=list(lincomb.derived.correlation.matrix = TRUE),
                          control.predictor=list(compute=TRUE),
                          control.family = list(link = link),
-                         control.compute = list(dic = TRUE, waic = TRUE, cpo=TRUE, mlik = TRUE,config=TRUE))
+                         control.compute = list(dic = TRUE, waic = TRUE, cpo=TRUE, mlik = TRUE,config=TRUE, return.marginals.predictor=TRUE))
       
       if(!model$ok){
         stop("Something wrong while running model with data! Please set verbose=TRUE to check!!!!")
@@ -142,7 +142,7 @@ library(INLA) \n")
                          control.inla=list(lincomb.derived.correlation.matrix = TRUE),
                          control.predictor=list(compute=TRUE),
                          control.family = list(link = link),
-                         control.compute = list(dic = TRUE, waic = TRUE, cpo=TRUE, mlik = TRUE,config=TRUE))
+                         control.compute = list(dic = TRUE, waic = TRUE, cpo=TRUE, mlik = TRUE, config=TRUE, return.marginals.predictor=TRUE))
       
       if(!model$ok){
         stop("Something wrong while running model with data! Please set verbose=TRUE to check!!!!")

@@ -16,7 +16,7 @@ library(INLA) \n")
     covariates.flag = outdata$covariates.flag
     modality.flag = outdata$modality.flag
     
-    quantiles = sort(unique(c(model$quantiles,0.025,0.5,0.975)))
+    quantiles = sort(unique(c(model$quantiles, 0.025, 0.5, 0.975)))
     effect.length = length(quantiles) + 2
     
     #### construct est
@@ -63,8 +63,10 @@ library(INLA) \n")
     names.var = c("var_phi","var_psi")
     names.cor = "cor"
     tau1.marginals = model[["marginals.hyperpar"]][[1]]
+    tau1.marginals[which(tau1.marginals[,2]<1e-8), 2]=0
     var1.marginals = INLA::inla.tmarginal(function(x) 1/x, tau1.marginals, n=1024)
     tau2.marginals = model[["marginals.hyperpar"]][[2]]
+    tau2.marginals[which(tau2.marginals[,2]<1e-8), 2]=0
     var2.marginals = INLA::inla.tmarginal(function(x) 1/x, tau2.marginals, n=1024)  
     marginals.hyperpar.temp = list()
     marginals.hyperpar.temp[[names.var[1]]] = var1.marginals
@@ -81,6 +83,7 @@ library(INLA) \n")
     summary.hyperpar.temp = as.matrix(summary.hyperpar.temp)
     rownames(summary.hyperpar.temp) = c(names.var,names.cor)
     est$summary.hyperpar = summary.hyperpar.temp
+    
     
     #############################################################################
     ######## study names and modality level names
@@ -368,8 +371,8 @@ library(INLA) \n")
     
     model.marginals.fitted.values.used = lapply(1:length(model[["marginals.fitted.values"]]), function(ind){
       x = model.marginals.fitted.values[[ind]][,1]
-      zero.index = which(abs(x-0)<1e-8)
-      one.index = which(abs(x-1)<1e-8)
+      zero.index = which(abs(x-0)<1e-5)
+      one.index = which(abs(x-1)<1e-5)
       if(length(zero.index)!=0){zero.index = zero.index[-which(zero.index==max(zero.index))]}
       if(length(one.index)!=0){one.index = one.index[-which(one.index==min(one.index))]}
       index = c(zero.index, one.index)
@@ -394,8 +397,12 @@ library(INLA) \n")
     transfunc.fitted = function(x) 1-x
     
     
-    marginals.transf.fitted.temp1 = lapply(marginals.fitted.temp1, function(x){INLA::inla.tmarginal(transfunc.fitted, x, n=n.marginal.point)})
-    marginals.transf.fitted.temp2 = lapply(marginals.fitted.temp2, function(x){INLA::inla.tmarginal(transfunc.fitted, x, n=n.marginal.point)})
+    marginals.transf.fitted.temp1 = lapply(marginals.fitted.temp1, function(x){
+      INLA::inla.tmarginal(transfunc.fitted, x, n=n.marginal.point)
+      })
+    marginals.transf.fitted.temp2 = lapply(marginals.fitted.temp2, function(x){
+      INLA::inla.tmarginal(transfunc.fitted, x, n=n.marginal.point)
+      })
     est[[paste("marginals.predictor.","(",names.transf.fitted[1],")",sep="")]] = marginals.transf.fitted.temp1
     est[[paste("marginals.predictor.","(",names.transf.fitted[2],")",sep="")]] = marginals.transf.fitted.temp2
     
