@@ -818,18 +818,19 @@ shinyServer(function(input, output, session) {
   output$sidebardatamodality <- renderUI({
     data = inputDataFile()
     pt_names = inputDataCM()
-    if(length(pt_names)>1){
-      new_pt_names = pt_names[pt_names!="None"]
-      class_pt_names = unlist(lapply(1:length(new_pt_names), function(x) class(data[,new_pt_names[x]])))
-      if(any(class_pt_names=="factor")){
-        modality = new_pt_names[class_pt_names=="factor"]
-        radioButtons("datamodality", label = NULL, choices = c("None",modality),selected = "None")
-      }else{
-        radioButtons("datamodality", label = NULL, choices = "None",selected = "None")
-      }
-    }else{
-      radioButtons("datamodality", label = NULL, choices = pt_names, selected=pt_names)
-    }
+    radioButtons("datamodality", label = NULL, choices = pt_names, selected="None")
+    # if(length(pt_names)>1){
+    #   new_pt_names = pt_names[pt_names!="None"]
+    #   class_pt_names = unlist(lapply(1:length(new_pt_names), function(x) class(data[,new_pt_names[x]])))
+    #   if(any(class_pt_names=="factor")){
+    #     modality = new_pt_names[class_pt_names=="factor"]
+    #     radioButtons("datamodality", label = NULL, choices = c("None",modality),selected = "None")
+    #   }else{
+    #     radioButtons("datamodality", label = NULL, choices = "None",selected = "None")
+    #   }
+    # }else{
+    #   radioButtons("datamodality", label = NULL, choices = pt_names, selected=pt_names)
+    # }
   })
   
   output$sidebarpartialdata <- renderUI({
@@ -838,13 +839,17 @@ shinyServer(function(input, output, session) {
     if(!is.null(choose_modality)){
       if(choose_modality != "None"){
         if(choose_modality %in% colnames(data)){
-          modality_type = class(data[,choose_modality])
-          if(modality_type=="factor"){
-            partial_data = levels(data[,choose_modality])
-            checkboxGroupInput("partialdata", label=NULL, choices = partial_data, selected = partial_data)
-          }else{
-            p("Not valid modality variable.")
-          }
+          data[, choose_modality] = as.factor(data[, choose_modality])
+          partial_data = levels(data[,choose_modality])
+          checkboxGroupInput("partialdata", label=NULL, choices = partial_data, selected = partial_data)
+          
+          # modality_type = class(data[,choose_modality])
+          # if(modality_type=="factor"){
+          #   partial_data = levels(data[,choose_modality])
+          #   checkboxGroupInput("partialdata", label=NULL, choices = partial_data, selected = partial_data)
+          # }else{
+          #   p("Not valid modality variable.")
+          # }
         }else{return()}
       }else{return()}
     }else{return()}
@@ -912,6 +917,7 @@ shinyServer(function(input, output, session) {
       
       data = inputDataFile()
       if(!is.null(modality)){
+        data[, modality] = as.factor(data[, modality])
         if(!is.null(partial)){
           idx = rep(FALSE, length(data[modality]))
           for(nam in partial)
